@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { checkPayrollExists, executePayrollRun } from "./actions";
+import { checkPayrollExists, executePayrollRun } from "../actions";
 import { formatMonthYear } from "@/lib/formatters";
 import { Loader2, AlertTriangle } from "lucide-react";
 import { useRouter } from "next/navigation";
