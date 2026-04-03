@@ -31,7 +31,7 @@ export default function BusinessSetupPage() {
   
   // Wait, Next.js 14/15 allows importing server actions directly and calling them.
   // We can just use useActionState from react.
-  const [state, formAction, isPending] = useActionState(setupBusiness, { error: null, success: false });
+  const [state, formAction, isPending] = useActionState(setupBusiness, { error: null as string | null, success: false });
 
   useEffect(() => {
     if (state.success) {

@@ -6,7 +6,7 @@ import { Loader2 } from "lucide-react";
 import Link from "next/link";
 
 export default function NewEmployeePage() {
-  const [state, formAction, isPending] = useActionState(addEmployee, { error: null, success: false });
+  const [state, formAction, isPending] = useActionState(addEmployee, { error: null as string | null, success: false });
   const [hasRent, setHasRent] = useState(false);
   const [hasPension, setHasPension] = useState(false);
 

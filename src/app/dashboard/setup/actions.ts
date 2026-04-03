@@ -30,7 +30,7 @@ export async function setupBusiness(
   const parsed = businessSchema.safeParse(rawData);
 
   if (!parsed.success) {
-    return { error: parsed.error.errors[0].message, success: false };
+    return { error: parsed.error.issues[0].message, success: false };
   }
 
   const { error } = await supabase.from("businesses").insert({
