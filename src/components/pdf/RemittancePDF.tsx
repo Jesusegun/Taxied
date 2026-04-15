@@ -127,7 +127,12 @@ interface PDFProps {
   tin: string;
   state: string;
   period: string; // e.g. "March 2026"
-  lineItems: any[];
+  lineItems: {
+    employee_name: string;
+    taxable_income: string | number;
+    paye: string | number;
+    net_pay: string | number;
+  }[];
   totalPaye: number;
 }
 

@@ -29,7 +29,7 @@ export async function addEmployee(
     .from("businesses")
     .select("id")
     .eq("user_id", user.id)
-    .single();
+    .maybeSingle();
 
   if (!business) {
     return { error: "No business found", success: false };
@@ -71,10 +71,35 @@ export async function addEmployee(
   redirect("/dashboard/employees");
 }
 
+/**
+ * Deletes an employee by ID after verifying caller ownership.
+ * @param id - The UUID of the employee to delete.
+ * @throws Redirects to login if not authenticated.
+ */
 export async function deleteEmployee(id: string) {
   const supabase = await createClient();
-  const { error } = await supabase.from("employees").delete().eq("id", id);
-  if (!error) {
-    revalidatePath("/dashboard/employees");
+  const { data: { user } } = await supabase.auth.getUser();
+
+  if (!user) {
+    return { error: "Not authenticated" };
   }
+
+  // Verify the employee belongs to a business owned by this user
+  const { data: employee } = await supabase
+    .from("employees")
+    .select("id, business_id, businesses(user_id)")
+    .eq("id", id)
+    .single();
+
+  if (!employee || (employee as any).businesses?.user_id !== user.id) {
+    return { error: "Not authorized to delete this employee" };
+  }
+
+  const { error } = await supabase.from("employees").delete().eq("id", id);
+  if (error) {
+    return { error: error.message };
+  }
+
+  revalidatePath("/dashboard/employees");
+  return { error: null };
 }

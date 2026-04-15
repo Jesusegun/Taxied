@@ -2,6 +2,7 @@ import { createClient } from "@/utils/supabase/server";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { LogOut, Calculator, Users, FileText } from "lucide-react";
+import { headers } from "next/headers";
 
 export default async function DashboardLayout({
   children,
@@ -20,7 +21,14 @@ export default async function DashboardLayout({
     .from("businesses")
     .select("id, name")
     .eq("user_id", user.id)
-    .single();
+    .maybeSingle();
+
+  // Redirect away from setup if business already exists
+  const headersList = await headers();
+  const pathname = headersList.get('x-invoke-path') || '';
+  if (business && pathname === '/dashboard/setup') {
+     redirect("/dashboard");
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
@@ -50,7 +58,11 @@ export default async function DashboardLayout({
               {business && (
                 <span className="text-sm text-gray-500 mr-4 border-r pr-4">{business.name}</span>
               )}
-              <form action="/auth/logout" method="post">
+              <form action={async () => {
+                "use server";
+                const { logout } = await import("@/app/auth/actions");
+                await logout();
+              }}>
                 <button type="submit" className="text-gray-500 hover:text-gray-700 flex items-center text-sm font-medium">
                   <LogOut className="w-4 h-4 mr-2" />
                   Sign out

@@ -2,13 +2,7 @@
 
 import { createClient } from "@/utils/supabase/server";
 import { revalidatePath } from "next/cache";
-import { z } from "zod";
-
-const businessSchema = z.object({
-  name: z.string().min(2, "Business name is required"),
-  state: z.string().min(2, "State is required"),
-  tin: z.string().optional(),
-});
+import { businessSchema } from "@/lib/schemas";
 
 export async function setupBusiness(
   prevState: { error: string | null; success: boolean },
@@ -19,6 +13,17 @@ export async function setupBusiness(
 
   if (!user) {
     return { error: "Not logged in", success: false };
+  }
+
+  // Guard: prevent duplicate business creation
+  const { data: existingBusiness } = await supabase
+    .from("businesses")
+    .select("id")
+    .eq("user_id", user.id)
+    .maybeSingle();
+
+  if (existingBusiness) {
+    return { error: "A business profile already exists for this account.", success: false };
   }
 
   const rawData = {

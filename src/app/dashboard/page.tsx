@@ -15,7 +15,7 @@ export default async function DashboardPage() {
     .from("businesses")
     .select("id, name")
     .eq("user_id", user.id)
-    .single();
+    .maybeSingle();
 
   if (!business) {
     redirect("/dashboard/setup");

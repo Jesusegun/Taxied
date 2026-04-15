@@ -14,7 +14,7 @@ export async function checkPayrollExists(month: string, year: number) {
     .from("businesses")
     .select("id")
     .eq("user_id", user.id)
-    .single();
+    .maybeSingle();
 
   if (!business) return { exists: false };
 
@@ -39,7 +39,7 @@ export async function executePayrollRun(month: string, year: number, overwrite: 
     .from("businesses")
     .select("id")
     .eq("user_id", user.id)
-    .single();
+    .maybeSingle();
 
   if (!business) return { error: "No business found" };
 
